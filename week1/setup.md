@@ -122,6 +122,8 @@ While Git is the software that tracks changes, GitHub is an online service that 
 
 For more, check out this [cheat sheet for the most commonly used Git commands](https://education.github.com/git-cheat-sheet-education.pdf)
 
+\* To push directly to GitHub from command line, you will need a Personal Access Token. GitHub has disabled you can checkout [the following instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) to generate a personal access token. When the terminal asks you for password, paste this personal access token instead of your GitHub password.
+
 ### Exercise 3
 - Git control the folder you created
 - Make your first commit
