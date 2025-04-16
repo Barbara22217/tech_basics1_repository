@@ -17,8 +17,8 @@ Bonus
 This should be how your current GitHub repository look like:
 ```
 - assignments/
-    - Week1/ascii.py
-    - Week2/game.py
+    - week1/ascii.py
+    - week2/game.py
 README.md
 ```
 Please put testing files to a separate folder or hide them.
