@@ -49,23 +49,23 @@ class Recipe(Generic[M]): #This defines a generic class named Recipe which works
     ) -> Dict[str, Any]:
         _save_related = new_attrs.get("_save_related", True) # Whether to save related objects
         _quantity = new_attrs.get("_quantity", 1)  # Number of instances to create
-# Extract related field attributes containing '__' (e.g., foreign key overrides)
+#Extract related field attributes containing '__' (e.g., foreign key overrides)
         rel_fields_attrs = {k: v for k, v in new_attrs.items() if "__" in k}
- # Extract direct attributes excluding related field overrides
+ #Extract direct attributes excluding related field overrides
         new_attrs = {k: v for k, v in new_attrs.items() if "__" not in k}
         mapping = self.attr_mapping.copy()  # Start from default attributes
         for k, v in self.attr_mapping.items():
             # do not generate values if field value is provided
             if k in new_attrs:
- # If value is an iterator (like a sequence), handle unique value generation
+ #If value is an iterator (like a sequence), handle unique value generation
                 continue
             elif isinstance(v, collections.abc.Iterator):
- # Resolve model class if given as string
+ #Resolve model class if given as string
                 if isinstance(self._model, str):
                     m = finder.get_model(self._model)
                 else:
                     m = self._model
-  # Initialize iterator backups if not present or if no objects exist in DB
+  #Initialize iterator backups if not present or if no objects exist in DB
                 if k not in self._iterator_backups or not m.objects.exists():
                     self._iterator_backups[k] = itertools.tee(
                         self._iterator_backups.get(k, [v])[0]
@@ -74,15 +74,15 @@ class Recipe(Generic[M]): #This defines a generic class named Recipe which works
             # If value is a RecipeForeignKey (related model recipe)
             elif isinstance(v, RecipeForeignKey):
                 attrs = {}
-  # Separate related attrs for this foreign key (like "fk__field")
+  #Separate related attrs for this foreign key (like "fk__field")
                 # Remove any related field attrs from the recipe attrs before filtering
                 for key, _value in list(rel_fields_attrs.items()):
                     if key.startswith(f"{k}__"):
                         attrs[key] = rel_fields_attrs.pop(key)
- # Filter related attrs specific to this foreign key
+ #Filter related attrs specific to this foreign key
                 recipe_attrs = baker.filter_rel_attrs(k, **attrs)
                 if _save_related:
- # For one-to-one relations, create unique foreign keys per quantity
+ #For one-to-one relations, create unique foreign keys per quantity
                     # Create a unique foreign key for each quantity if one_to_one required
                     if v.one_to_one is True:
                         rel_gen = [
@@ -92,15 +92,15 @@ class Recipe(Generic[M]): #This defines a generic class named Recipe which works
                         mapping[k] = itertools.cycle(rel_gen) # Cycle through unique related instances
                     # Otherwise create shared foreign key for each quantity
                     else:
- # For many-to-one, create one shared related instance for all quantity
+ #For many-to-one, create one shared related instance for all quantity
                         mapping[k] = v.recipe.make(_using=_using, **recipe_attrs)
                 else:
- # If not saving related objects, prepare unsaved related instances
+ #If not saving related objects, prepare unsaved related instances
                     mapping[k] = v.recipe.prepare(_using=_using, **recipe_attrs)
- # If value is a related object handler, call its make method
+ #If value is a related object handler, call its make method
             elif isinstance(v, related):
                 mapping[k] = v.make
- # For containers like lists or dicts, deep copy to avoid shared mutable state
+ #For containers like lists or dicts, deep copy to avoid shared mutable state
             elif isinstance(v, collections.abc.Container):
                 mapping[k] = copy.deepcopy(v)
 
@@ -134,7 +134,7 @@ class Recipe(Generic[M]): #This defines a generic class named Recipe which works
         _save_kwargs: Optional[Dict[str, Any]] = None,
         **attrs: Any,
     ) -> List[M]: ...
-# It’s a clean way to let type checkers know: that this method can return one or many depending on how you call it.
+#It’s a clean way to let type checkers know: that this method can return one or many depending on how you call it.
 
     def make(
         self,
@@ -210,7 +210,7 @@ class Recipe(Generic[M]): #This defines a generic class named Recipe which works
         attr_mapping.update(attrs) #Update the copied mapping with any new or overridden attributes provided
         return type(self)(self._model, **attr_mapping) #Return a new instance of the same Recipe class, with: The same model (self._model) The updated attribute mapping
 
-# This function below loads a recipe object by name (string) from the calling module - i.e., the file where the function was called.
+#This function below loads a recipe object by name (string) from the calling module - i.e., the file where the function was called.
 def _load_recipe_from_calling_module(recipe: str) -> Recipe[Model]: 
     """Load `Recipe` from the string attribute given from the calling module.
 
